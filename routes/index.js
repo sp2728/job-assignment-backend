@@ -11,5 +11,8 @@ router.get('/chart', userController.getChartData);
 
 router.post('/clickTime', userController.addClickTime);
 
+router.get('/patients', userController.getPatientsData);
+
+router.get('/labels', userController.getLabelData);
 
 module.exports = router;

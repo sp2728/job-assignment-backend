@@ -6,13 +6,13 @@ const models = require('../models');
 exports.addUser = (req, res, next) => {
     try {
 
-        models.User.findOne({where: {userId: req.body.userId}})
+        models.Account.findOne({where: {username: req.body.username}})
         .then((user)=>{
             if(user){
                 res.json({ success: false, status: 'User Already Exists!' });
             }
             else{
-                models.User.create({name: req.body.name, userId: req.body.userId})
+                models.Account.create({fullName: req.body.fullName, username: req.body.username, email: req.body.email, password:req.body.password})
                 .then(response=>{
                     if (response) {
                         res.json({ success: true, status: 'Registration Successful!' });
@@ -34,14 +34,65 @@ exports.addUser = (req, res, next) => {
 
 exports.authenticateUser = (req, res, next)=>{
     try{
-        models.User.findOne({where: {userId: req.body.userId}})
+        models.Account.findOne({where: {username: req.body.username}})
         .then((user)=>{
             if(user){
-                res.statusCode = 200;
-                res.json({ success: true, status: 'User authenticated Successfully!', users: user }); 
+
+                if(user.password == req.body.password){
+                    res.statusCode = 200;
+                    res.json({ success: true, status: 'User authenticated Successfully!', users: user }); 
+                }
+                else{
+                    res.statusCode = 401;
+                    res.json({ success: false, status: 'Incorrect username or password!', users: user }); 
+                }
+
             }
             else{
+                res.statusCode = 404;
                 res.json({ success: false, status: 'No User exists'});  
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+exports.getPatientsData = (req, res, next) =>{
+    try{
+        models.Patient.findAll()
+        .then((patients)=>{
+            if(patients){
+                res.statusCode = 200;
+                res.json({ success: true, status: 'Patients retrieved successfully!', patients }); 
+            }
+            else{
+                res.json({ success: false, status: 'No patient exists'});  
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+exports.getLabelData = (req, res, next) =>{
+    try{
+        models.Label.findAll()
+        .then((labels)=>{
+            if(labels){
+                res.statusCode = 200;
+                res.json({ success: true, status: 'Labels retrieved successfully!', labels }); 
+            }
+            else{
+                res.json({ success: false, status: 'No Labels exists'});  
             }
         })
         .catch((err) => {
